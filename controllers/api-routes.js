@@ -4,7 +4,9 @@
 
 // Dependencies
 // =============================================================
-
+// scraping tools
+var request = require("request");
+var cheerio = require("cheerio");
 
 // Requiring our models
 var db = require("../models");
@@ -12,6 +14,44 @@ var db = require("../models");
 // Routes
 // =============================================================
 module.exports = function(app) {
+
+    app.post("/api/scrape", function(req, res) {
+        // KXAN.com | Austin News & Weather
+        request("http://kxan.com/category/news/local/austin/", function(error, response, html) {
+            // Load the HTML into cheerio and save it to a variable
+            var $ = cheerio.load(html);
+    
+            var results = [];
+    
+            // cheerio's Selectors:
+            // $( selector, [context], [root] ) -- selector searches within the context scope which searches within the root scope.
+            $("article.media-object", "main#main").each(function(i, element) {
+    
+                var article = {};
+    
+                article.postid = $(element).attr("id");
+                article.title = $(element).children("header").children("h1").children("a").text();
+                article.link = $(element).children("header").children("h1").children("a").attr("href");
+                article.img = $(element).children("figure").children("a").children("img").attr("src");
+                article.summary = $(element).children("div").children("p").text();
+    
+                // db.Article
+                // .findOne({ postid: article.postid })
+                // .then(function(dbArticle) {
+                //     results.push(article);
+                // });
+    
+                results.push(article);
+            });
+    
+            db.Article.create(results).then(function(dbArticle) {
+                res.json(dbArticle);
+            })
+            .catch(function(err) {
+                res.status(500).json(err);
+            });
+        });
+    });
 
     // insert a new note!
     // req.params.id = Article._id
@@ -50,7 +90,7 @@ module.exports = function(app) {
 
     app.put("/api/articles/:id", function(req, res) {
         db.Article
-            .update( { _id: id}, req.body)
+            .update( { _id: req.params.id }, req.body)
             .then(function(dbArticle) {
                 res.json(dbArticle);
             })
