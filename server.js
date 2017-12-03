@@ -30,16 +30,30 @@ app.set("view engine", "handlebars");
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/austinnews", {
-    useMongoClient: true
-});
+if(process.env.MONGODB_URI) {
+    mongoose.connect(process.env.MONGODB_URI, {
+        useMongoClient: true
+    });
+}
+else {
+    mongoose.connect("mongodb://localhost/austinnews", {
+        useMongoClient: true
+    });
+}
 
 // Routes
 require("./controllers/html-routes.js")(app);
 require("./controllers/api-routes.js")(app);
 
 // Start the server
-app.listen(PORT, function() {
-  console.log("App running on port " + PORT + "!");
+mongoose.connection.on('error', function(err) {
+    console.log("Mongoose Error: " + err);
+})
+
+mongoose.connection.on('open', function() {
+    console.log("Mongoose connection successful.");
+    app.listen(PORT, function() {
+        console.log("App running on port " + PORT + "!");
+    });
 });
 
