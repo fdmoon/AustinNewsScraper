@@ -15,7 +15,14 @@ module.exports = function(app) {
 
     app.get("/", function(req, res) {
         db.Article
-            .find({ saved: false })
+            .find(
+                { saved: false },           // Search Filters
+                [],                         // Columns to Return
+                {
+                    limit: 20,              // Ending Row
+                    sort: { postid: -1 }    // Order by (1: ASC, -1: DESC)
+                }
+            )
             .then(function(dbArticle) {
                 var hbsObject = {
                     hasArticles: (dbArticle.length > 0) ? true : false,
@@ -33,18 +40,24 @@ module.exports = function(app) {
 
     app.get("/saved", function(req, res) {
         db.Article
-        .find({ saved: true })
-        .then(function(dbArticle) {
-            var hbsObject = {
-                hasArticles: (dbArticle.length > 0) ? true : false,
-                articles: dbArticle
-            }
-            res.render("saved", hbsObject);
-        })
-        .catch(function(err) {
-            // If an error occurred, send it to the client
-            res.json(err);
-        });
+            .find(
+                { saved: true },            // Search Filters
+                [],                         // Columns to Return
+                {
+                    sort: { postid: -1 }    // Order by (1: ASC, -1: DESC)
+                }
+            )
+            .then(function(dbArticle) {
+                var hbsObject = {
+                    hasArticles: (dbArticle.length > 0) ? true : false,
+                    articles: dbArticle
+                }
+                res.render("saved", hbsObject);
+            })
+            .catch(function(err) {
+                // If an error occurred, send it to the client
+                res.json(err);
+            });
 
         // res.sendFile(path.join(__dirname, "../public/saved.html"));
     });
@@ -52,7 +65,14 @@ module.exports = function(app) {
     app.get("/articles", function(req, res) {
         // Grab every unsaved document in the Articles collection
         db.Article
-            .find({ saved: false })
+            .find(
+                { saved: false },           // Search Filters
+                [],                         // Columns to Return
+                {
+                    limit: 20,              // Ending Row
+                    sort: { postid: -1 }    // Order by (1: ASC, -1: DESC)
+                }
+            )
             .then(function(dbArticle) {
                 // If we were able to successfully find Articles, send them back to the client
                 res.json(dbArticle);
@@ -66,8 +86,13 @@ module.exports = function(app) {
     app.get("/articles/saved", function(req, res) {
         // Grab every saved document in the Articles collection
         db.Article
-            .find({ saved: true })
-            .populate("note")
+            .find(
+                { saved: true },            // Search Filters
+                [],                         // Columns to Return
+                {
+                    sort: { postid: -1 }    // Order by (1: ASC, -1: DESC)
+                }
+            )
             .then(function(dbArticle) {
                 // If we were able to successfully find Articles, send them back to the client
                 res.json(dbArticle);

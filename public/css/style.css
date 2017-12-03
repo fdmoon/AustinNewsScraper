@@ -14,3 +14,29 @@ a#scraping:hover {
     cursor:pointer;
 }
 
+.empty-col {
+    text-align: center;
+    color: red;
+}
+
+.btn-col {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.btn-notes {
+    width: 100%;
+    padding: 5px 0;
+    margin-bottom: 10px;
+}
+
+.btn-unsaved {
+    width: 100%;
+    padding: 5px 0;
+    background-color: red;
+}
+
+.btn-unsaved:hover {
+    background-color:#b00802 !important;
+}
+
