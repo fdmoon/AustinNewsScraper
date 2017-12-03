@@ -47,6 +47,7 @@ module.exports = function(app) {
                     sort: { postid: -1 }    // Order by (1: ASC, -1: DESC)
                 }
             )
+            .populate("notes")
             .then(function(dbArticle) {
                 var hbsObject = {
                     hasArticles: (dbArticle.length > 0) ? true : false,
@@ -93,6 +94,7 @@ module.exports = function(app) {
                     sort: { postid: -1 }    // Order by (1: ASC, -1: DESC)
                 }
             )
+            .populate("notes")
             .then(function(dbArticle) {
                 // If we were able to successfully find Articles, send them back to the client
                 res.json(dbArticle);
@@ -108,7 +110,7 @@ module.exports = function(app) {
         db.Article
             .findOne({ _id: req.params.id })
             // ..and populate all of the notes associated with it
-            .populate("note")
+            .populate("notes")
             .then(function(dbArticle) {
                 // If we were able to successfully find an Article with the given id, send it back to the client
                 res.json(dbArticle);

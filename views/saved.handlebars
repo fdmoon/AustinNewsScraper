@@ -55,7 +55,7 @@
                     </p>
                 </div>
                 <div class="col-lg-2 btn-col">
-                    <button class="btn btn-primary float-right btn-notes" data-id="{{this._id}}">ARTICLE NOTES</button>
+                    <button class="btn btn-primary float-right btn-notes" data-id="{{this._id}}">ARTICLE NOTES ({{this.notes.length}})</button>
                     <button class="btn btn-primary float-right btn-unsaved" data-id="{{this._id}}">DELETE FROM SAVED</button>
                 </div>
             </div>
@@ -109,6 +109,30 @@
         </div>
     </div>
 </footer>
+
+<!-- Modal -->
+<div class="modal fade" id="noteModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong class="modal-title">Notes For Article: <span id="noteTarget"></span></strong>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div id="modalText" class="modal-body">
+                <div id="noteView" class="panel panel-default">
+                </div>
+                <div class="form-group">
+                    <label for="newNote">New Note</label>
+                    <textarea class="form-control" rows="3" id="newNote" placeholder="Write your notes here"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="addNote" type="button" class="btn btn-primary">Save Note</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
