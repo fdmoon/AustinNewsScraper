@@ -12,6 +12,11 @@
 
 a#scraping:hover {
     cursor:pointer;
+    border: 2px solid #fff;
+}
+
+a.nav-link:hover {
+    border: 2px solid #fff;
 }
 
 .empty-col {
@@ -24,15 +29,17 @@ a#scraping:hover {
     padding-right: 5px;
 }
 
-.btn-notes {
+.btn-notes, .btn-unsaved {
     width: 100%;
     padding: 5px 0;
+    font-size: 13px;
+}
+
+.btn-notes {
     margin-bottom: 10px;
 }
 
 .btn-unsaved {
-    width: 100%;
-    padding: 5px 0;
     background-color: red;
 }
 

@@ -16,9 +16,8 @@ $(document).ready(function() {
     $(".btn-saved").on("click", function() {
         var id = $(this).attr("data-id");
         $.ajax({
-            url: "/api/articles/" + id,
-            method: "PUT",
-            data: { saved: true }
+            url: "/api/articles/save/" + id,
+            method: "PUT"
         })
         .done(function() {
             location.reload();
@@ -33,3 +32,4 @@ $(document).ready(function() {
     });
 
 });
+

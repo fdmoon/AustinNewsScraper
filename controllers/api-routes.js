@@ -15,13 +15,32 @@ var db = require("../models");
 // =============================================================
 module.exports = function(app) {
 
+    const articleCreatePromise = (article) => {
+        return new Promise((resolve,reject) => {
+            db.Article.create(article).then(function(dbArticle) {
+                var retObject = {
+                    result: true,
+                    data: dbArticle
+                }
+                resolve(retObject);
+            })
+            .catch(function(err) {
+                var retObject = {
+                    result: false,
+                    message: err.message
+                }
+                resolve(retObject);
+            });
+        });
+    }
+
     function ScrapingFromKxan(req, res) {
         // KXAN.com | Austin News & Weather
         request("http://kxan.com/category/news/local/austin/", function(error, response, html) {
             // Load the HTML into cheerio and save it to a variable
             var $ = cheerio.load(html);
 
-            var results = [];
+            var promiseArray = [];
 
             // cheerio's Selectors:
             // $( selector, [context], [root] ) -- selector searches within the context scope which searches within the root scope.
@@ -35,37 +54,28 @@ module.exports = function(app) {
                 article.img = $(element).children("figure").children("a").children("img").attr("src");
                 article.summary = $(element).children("div").children("p").text();
 
-                // db.Article
-                // .findOne({ postid: article.postid })
-                // .then(function(dbArticle) {
-                //     results.push(article);
-                // });
-
-                results.push(article);
+                promiseArray.push(articleCreatePromise(article));
             });
 
-            db.Article.create(results).then(function(dbArticle) {
-                res.json(dbArticle);
-            })
-            .catch(function(err) {
-                res.status(500).json(err);
-            });
+            const allTheThings = Promise.all(promiseArray);
+
+            allTheThings
+                .then((results) => {
+                    res.json(results.filter((item) => item.result === true));
+                })
+                .catch(function(err) {
+                    res.status(500).json(err);
+                });
         });
     }
 
     app.post("/api/scrape", function(req, res) {
-        db.Note.remove({}, function(err) {
+        db.Article.remove({ saved: false }, function(err) {
             if(err) {
                 res.send(err)
             }
-            
-            db.Article.remove({}, function(err) {
-                if(err) {
-                    res.send(err)
-                }
 
-                ScrapingFromKxan(req, res)
-            });
+            ScrapingFromKxan(req, res)
         });
     });
 
@@ -134,4 +144,38 @@ module.exports = function(app) {
             });
     });
 
+    app.put("/api/articles/save/:id", function(req, res) {
+        db.Article
+            .update({ _id: req.params.id }, { saved: true })
+            .then(function(dbArticle) {
+                res.json(dbArticle);
+            })
+            .catch(function(err) {
+                res.json(err);
+            });
+    });
+
+    app.put("/api/articles/unsave/:id", function(req, res) {
+
+        db.Article.findOneAndUpdate({ _id: req.params.id }, { saved: false }, { new: true })
+            .then(function(dbArticle) {
+                db.Note
+                    .remove({ _id: dbArticle.notes })
+                    .then(function(dbNote) {
+                        return db.Article.findOneAndUpdate({ _id: dbArticle._id }, { notes: [] }, { new: true });
+                    })
+                    .then(function(newArticle) {
+                        res.json(newArticle);
+                    })
+                    .catch(function(err) {
+                        res.json(err);
+                    });
+            })
+            .catch(function(err) {
+                res.json(err);
+            });
+
+    });
+
 };
+

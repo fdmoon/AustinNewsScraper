@@ -71,9 +71,8 @@ $(document).ready(function() {
     $(".btn-unsaved").on("click", function() {
         var id = $(this).attr("data-id");
         $.ajax({
-            url: "/api/articles/" + id,
-            method: "PUT",
-            data: { saved: false }
+            url: "/api/articles/unsave/" + id,
+            method: "PUT"
         })
         .done(function() {
             location.reload();
